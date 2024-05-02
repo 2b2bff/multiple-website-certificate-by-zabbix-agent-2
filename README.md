@@ -28,14 +28,5 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$CERT.WEBSITE.LIST}|Array of elements - hostname(:port(:IP)) where each host is delimited by a comma.|`<hostname1>(:<port1>(:<IP1>)),<hostname2>(:<port2>(:<IP2>)), ...`|
 |{$CERT.EXPIRY.WARN}|Number of days until the certificate expires.|`7`|
-|{$CERT.WEBSITE.IP}|Default IP address for the connection.|`` |
-|{$CERT.WEBSITE.PORT}|Default TLS/SSL port number of the website.|`443`|
-
----
-**Like, share and follow us** 😍 for more content:
-- [LinkedIn](https://www.linkedin.com/company/initmax/)🔥
-- [Twitter](https://twitter.com/initmax)
-- [Instagram](https://www.instagram.com/initmax/)
-- [Facebook](https://www.facebook.com/initmax)
-- [Web](https://www.initmax.cz/)
-- [Youtube](https://www.youtube.com/@initmax1)
+|{$CERT.WEBSITE.IP}|Default IP address.|`` |
+|{$CERT.WEBSITE.PORT}|Default TLS/SSL port.|`443`|
