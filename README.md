@@ -16,9 +16,7 @@ This template allows you to monitor multiple TLS/SSL certificates on a single ho
 
 3\. Link the template to the host.
 
-4\. Customize the value of {$CERT.WEBSITE.HOSTNAME} macro.
-
-5\. Customize the value of {$CERT.ARRAY} macro.
+4\. Customize the value of {$CERT.WEBSITE.LIST} macro.
 
 ## Zabbix configuration
 
@@ -28,11 +26,10 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$CERT.ARRAY}|Array of elements - hostname(:port(:IP)) where each host is delimited by a comma. The default port is '443'.|`<hostname1>(:<port1>(:<IP1>)),<hostname2>(:<port2>(:<IP2>)), ...`|
+|{$CERT.WEBSITE.LIST}|Array of elements - hostname(:port(:IP)) where each host is delimited by a comma.|`<hostname1>(:<port1>(:<IP1>)),<hostname2>(:<port2>(:<IP2>)), ...`|
 |{$CERT.EXPIRY.WARN}|Number of days until the certificate expires.|`7`|
-|{$CERT.WEBSITE.HOSTNAME}|The website DNS name for the connection.|`<Put DNS name>`|
-|{$CERT.WEBSITE.IP}|The website IP address for the connection.|`` |
-|{$CERT.WEBSITE.PORT}|The TLS/SSL port number of the website.|`443`|
+|{$CERT.WEBSITE.IP}|Default IP address for the connection.|`` |
+|{$CERT.WEBSITE.PORT}|Default TLS/SSL port number of the website.|`443`|
 
 ---
 **Like, share and follow us** 😍 for more content:
