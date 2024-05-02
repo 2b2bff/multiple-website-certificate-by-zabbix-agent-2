@@ -1,7 +1,6 @@
 zabbix_export:
-  version: '6.0'
-  date: '2023-10-04T17:00:32Z'
-  groups:
+  version: '6.4'
+  template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
@@ -11,10 +10,10 @@ zabbix_export:
       description: |
         Developed by initMAX s.r.o.
         Based on original Zabbix template "Website certificate by Zabbix agent 2"
-        
+
         Macro format:
         <hostname1>:<443>:<IP1>,<hostname2>,<hostname3>:<port3>
-        
+
         In case of problem, please contact us: https://www.initmax.com/
       groups:
         - name: Templates/Applications
@@ -26,24 +25,25 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           params: |
-            // Program pro zjisteni obsahu makra na hostovi pomoci API initMAX - Alois Zadrazil
-            params = JSON.parse(value),
-            
-            pole = params.Macro.split(",");
-            out_string = '';
-            for (x in pole) {
-              polozka = pole[x].split(":");
-              out_string += '{"HOSTNAME":"'+ polozka[0]+ '"';
-              if (polozka[1]) { out_string += ',"PORT":"'+ polozka[1] + '"' ;} else { out_string += ',"PORT":""' ;}
-              if (polozka[2]) { out_string += ',"IP":"'+ polozka[2] + '"' ; } else { out_string += ',"IP":""' ; }
-              out_string+= '},';
-             }
-            out_string = out_string.substring(0, out_string.length - 1);
-            
-            return '[' + out_string + ']';
+            params = JSON.parse(value);
+            res = [];
+            arr = params.list.split(",");
+            for (i in arr) {
+              v = arr[i].split(":").map(function(s) { return s.trim(); } );
+              res.push({
+                 "HOSTNAME": v[0],
+                 "PORT"    : v[1] ? v[1] : params.port,
+                 "IP"      : v[2] ? v[2] : params.ip
+              });
+            }
+            return JSON.stringify(res);
           parameters:
-            - name: Macro
-              value: '{$CERT.ARRAY}'
+            - name: ip
+              value: '{$CERT.WEBSITE.IP}'
+            - name: list
+              value: '{$CERT.WEBSITE.LIST}'
+            - name: port
+              value: '{$CERT.WEBSITE.PORT}'
       discovery_rules:
         - uuid: f67b0599ee564131b99530aed4064562
           name: 'certHosts discovery'
@@ -413,17 +413,13 @@ zabbix_export:
             - lld_macro: '{#PORT}'
               path: $.PORT
       macros:
-        - macro: '{$CERT.ARRAY}'
-          value: '<hostname1>:<443>:<IP1>,<hostname2>:<443>:<IP2>'
-          description: 'Array of hostnames, IP addresses and ports.'
         - macro: '{$CERT.EXPIRY.WARN}'
           value: '7'
           description: 'Number of days until the certificate expires.'
-        - macro: '{$CERT.WEBSITE.HOSTNAME}'
-          value: '<Put DNS name>'
-          description: 'The website DNS name for the connection.'
         - macro: '{$CERT.WEBSITE.IP}'
           description: 'The website IP address for the connection.'
+        - macro: '{$CERT.WEBSITE.LIST}'
+          description: 'List of hostnames, ports and ip addresses. Port and ip are optional. Example: <hostname1>:<port1>:<ip1>,<hostname2>:<port2>,<hostname3>'
         - macro: '{$CERT.WEBSITE.PORT}'
           value: '443'
           description: 'The TLS/SSL port number of the website.'
