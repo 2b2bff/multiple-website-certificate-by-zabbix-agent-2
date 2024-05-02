@@ -24,9 +24,9 @@ No specific Zabbix configuration is required.
 
 ### Macros used
 
-|Name|Description|Default|
-|----|-----------|-------|
-|{$CERT.WEBSITE.LIST}|Array of elements - hostname(:port(:IP)) where each host is delimited by a comma.|`<hostname1>(:<port1>(:<IP1>)),<hostname2>(:<port2>(:<IP2>)), ...`|
-|{$CERT.EXPIRY.WARN}|Number of days until the certificate expires.|`7`|
-|{$CERT.WEBSITE.IP}|Default IP address.|`` |
-|{$CERT.WEBSITE.PORT}|Default TLS/SSL port.|`443`|
+|Name|Description|Default|Example|
+|----|-----------|-------|-------|
+|{$CERT.WEBSITE.LIST}|Array of elements - hostname(:port(:IP)) where each host is delimited by a comma.||`<hostname1>[:<port1>[:<ip1>]],<hostname2>[:<port2>[:<IP2>]], ...`|
+|{$CERT.EXPIRY.WARN}|Number of days until the certificate expires.|7|30|
+|{$CERT.WEBSITE.IP}|Default IP address.|||
+|{$CERT.WEBSITE.PORT}|Default TLS/SSL port.|443||
