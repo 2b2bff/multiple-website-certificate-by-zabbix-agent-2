@@ -31,9 +31,10 @@ zabbix_export:
             for (i in arr) {
               v = arr[i].split(":").map(function(s) { return s.trim(); } );
               res.push({
-                 "HOSTNAME": v[0],
-                 "PORT"    : v[1] ? v[1] : params.port,
-                 "IP"      : v[2] ? v[2] : params.ip
+                "HOSTNAME"    : v[0],
+                "PORT"        : v[1] ? v[1] : params.port,
+                "IP"          : v[2] ? v[2] : params.ip,
+                "DISPLAYNAME" : v[1] ? v[0] + '_' + v[1] : v[0]
               });
             }
             return JSON.stringify(res);
@@ -53,9 +54,9 @@ zabbix_export:
           lifetime: '0'
           item_prototypes:
             - uuid: e040b1e943c34886bef9fd19d7e3dca2
-              name: 'Cert: Subject alternative name on {#HOSTNAME}'
+              name: 'Cert: Subject alternative name on {#DISPLAYNAME}'
               type: DEPENDENT
-              key: 'cert.alternative_names[{#HOSTNAME}]'
+              key: 'cert.alternative_names[{#DISPLAYNAME}]'
               delay: '0'
               trends: '0'
               value_type: TEXT
@@ -67,7 +68,7 @@ zabbix_export:
                 key: 'web.certificate.get[{#HOSTNAME},{#PORT},{#IP}]'
               tags:
                 - tag: hostname
-                  value: '{#HOSTNAME}'
+                  value: '{#DISPLAYNAME}'
                 - tag: resource
                   value: general
                 - tag: target
@@ -77,14 +78,14 @@ zabbix_export:
                 - tag: type
                   value: gauge
             - uuid: aeffb351a3b7498c9997a46515c6b7d4
-              name: 'Cert: Days to Expire of {#HOSTNAME}'
+              name: 'Cert: Days to Expire of {#DISPLAYNAME}'
               type: CALCULATED
-              key: 'cert.expire.timer[{#HOSTNAME}]'
+              key: 'cert.expire.timer[{#DISPLAYNAME}]'
               units: '!days'
-              params: '(last(//cert.not_after[{#HOSTNAME}]) - now()) / 86400'
+              params: '(last(//cert.not_after[{#DISPLAYNAME}]) - now()) / 86400'
               tags:
                 - tag: hostname
-                  value: '{#HOSTNAME}'
+                  value: '{#DISPLAYNAME}'
                 - tag: resource
                   value: general
                 - tag: target
@@ -94,9 +95,9 @@ zabbix_export:
                 - tag: type
                   value: gauge
             - uuid: 1898545925464a63979b59589693755c
-              name: 'Cert: Issuer on {#HOSTNAME}'
+              name: 'Cert: Issuer on {#DISPLAYNAME}'
               type: DEPENDENT
-              key: 'cert.issuer[{#HOSTNAME}]'
+              key: 'cert.issuer[{#DISPLAYNAME}]'
               delay: '0'
               trends: '0'
               value_type: TEXT
@@ -108,7 +109,7 @@ zabbix_export:
                 key: 'web.certificate.get[{#HOSTNAME},{#PORT},{#IP}]'
               tags:
                 - tag: hostname
-                  value: '{#HOSTNAME}'
+                  value: '{#DISPLAYNAME}'
                 - tag: resource
                   value: general
                 - tag: target
@@ -118,9 +119,9 @@ zabbix_export:
                 - tag: type
                   value: gauge
             - uuid: 4f38dfd263c044b7aebf41882a4baea8
-              name: 'Cert: Last validation status on {#HOSTNAME}'
+              name: 'Cert: Last validation status on {#DISPLAYNAME}'
               type: DEPENDENT
-              key: 'cert.message[{#HOSTNAME}]'
+              key: 'cert.message[{#DISPLAYNAME}]'
               delay: '0'
               trends: '0'
               value_type: TEXT
@@ -132,7 +133,7 @@ zabbix_export:
                 key: 'web.certificate.get[{#HOSTNAME},{#PORT},{#IP}]'
               tags:
                 - tag: hostname
-                  value: '{#HOSTNAME}'
+                  value: '{#DISPLAYNAME}'
                 - tag: resource
                   value: general
                 - tag: target
@@ -142,9 +143,9 @@ zabbix_export:
                 - tag: type
                   value: gauge
             - uuid: 8c9fb372813947f1a93d5ae13134f311
-              name: 'Cert: Expires on {#HOSTNAME}'
+              name: 'Cert: Expires on {#DISPLAYNAME}'
               type: DEPENDENT
-              key: 'cert.not_after[{#HOSTNAME}]'
+              key: 'cert.not_after[{#DISPLAYNAME}]'
               delay: '0'
               units: unixtime
               preprocessing:
@@ -155,7 +156,7 @@ zabbix_export:
                 key: 'web.certificate.get[{#HOSTNAME},{#PORT},{#IP}]'
               tags:
                 - tag: hostname
-                  value: '{#HOSTNAME}'
+                  value: '{#DISPLAYNAME}'
                 - tag: resource
                   value: general
                 - tag: target
@@ -166,18 +167,18 @@ zabbix_export:
                   value: gauge
               trigger_prototypes:
                 - uuid: f970a329c82f4bf0b3103b8cfc6a1e36
-                  expression: '(last(/Multiple Website certificate by Zabbix agent 2/cert.not_after[{#HOSTNAME}]) - now()) / 86400 < {$CERT.EXPIRY.WARN}'
-                  name: 'Cert: SSL certificate {#HOSTNAME} expires soon (less than {$CERT.EXPIRY.WARN} days)'
+                  expression: '(last(/Multiple Website certificate by Zabbix agent 2/cert.not_after[{#DISPLAYNAME}]) - now()) / 86400 < {$CERT.EXPIRY.WARN}'
+                  name: 'Cert: SSL certificate {#DISPLAYNAME} expires soon (less than {$CERT.EXPIRY.WARN} days)'
                   priority: WARNING
                   description: 'The SSL certificate should be updated or it will become untrusted.'
                   manual_close: 'YES'
                   dependencies:
-                    - name: 'Cert: SSL certificate {#HOSTNAME} is invalid'
-                      expression: 'find(/Multiple Website certificate by Zabbix agent 2/cert.validation[{#HOSTNAME}],,"like","invalid")=1'
+                    - name: 'Cert: SSL certificate {#DISPLAYNAME} is invalid'
+                      expression: 'find(/Multiple Website certificate by Zabbix agent 2/cert.validation[{#DISPLAYNAME}],,"like","invalid")=1'
             - uuid: e2f017daad1144e596c6fc59e9af5370
-              name: 'Cert: Valid from on {#HOSTNAME}'
+              name: 'Cert: Valid from on {#DISPLAYNAME}'
               type: DEPENDENT
-              key: 'cert.not_before[{#HOSTNAME}]'
+              key: 'cert.not_before[{#DISPLAYNAME}]'
               delay: '0'
               units: unixtime
               preprocessing:
@@ -188,7 +189,7 @@ zabbix_export:
                 key: 'web.certificate.get[{#HOSTNAME},{#PORT},{#IP}]'
               tags:
                 - tag: hostname
-                  value: '{#HOSTNAME}'
+                  value: '{#DISPLAYNAME}'
                 - tag: resource
                   value: general
                 - tag: target
@@ -198,9 +199,9 @@ zabbix_export:
                 - tag: type
                   value: gauge
             - uuid: 7df1d1da88a9478cba0a03a5f634e9cd
-              name: 'Cert: Public key algorithm on {#HOSTNAME}'
+              name: 'Cert: Public key algorithm on {#DISPLAYNAME}'
               type: DEPENDENT
-              key: 'cert.public_key_algorithm[{#HOSTNAME}]'
+              key: 'cert.public_key_algorithm[{#DISPLAYNAME}]'
               delay: '0'
               trends: '0'
               value_type: CHAR
@@ -212,7 +213,7 @@ zabbix_export:
                 key: 'web.certificate.get[{#HOSTNAME},{#PORT},{#IP}]'
               tags:
                 - tag: hostname
-                  value: '{#HOSTNAME}'
+                  value: '{#DISPLAYNAME}'
                 - tag: resource
                   value: general
                 - tag: target
@@ -222,9 +223,9 @@ zabbix_export:
                 - tag: type
                   value: gauge
             - uuid: 915d645e50c246ba9bb0ca72755406e3
-              name: 'Cert: Serial number on {#HOSTNAME}'
+              name: 'Cert: Serial number on {#DISPLAYNAME}'
               type: DEPENDENT
-              key: 'cert.serial_number[{#HOSTNAME}]'
+              key: 'cert.serial_number[{#DISPLAYNAME}]'
               delay: '0'
               trends: '0'
               value_type: CHAR
@@ -236,7 +237,7 @@ zabbix_export:
                 key: 'web.certificate.get[{#HOSTNAME},{#PORT},{#IP}]'
               tags:
                 - tag: hostname
-                  value: '{#HOSTNAME}'
+                  value: '{#DISPLAYNAME}'
                 - tag: resource
                   value: general
                 - tag: target
@@ -246,9 +247,9 @@ zabbix_export:
                 - tag: type
                   value: gauge
             - uuid: 05794b8c5dd7428995655e9c97282af3
-              name: 'Cert: Fingerprint on {#HOSTNAME}'
+              name: 'Cert: Fingerprint on {#DISPLAYNAME}'
               type: DEPENDENT
-              key: 'cert.sha1_fingerprint[{#HOSTNAME}]'
+              key: 'cert.sha1_fingerprint[{#DISPLAYNAME}]'
               delay: '0'
               trends: '0'
               value_type: CHAR
@@ -260,7 +261,7 @@ zabbix_export:
                 key: 'web.certificate.get[{#HOSTNAME},{#PORT},{#IP}]'
               tags:
                 - tag: hostname
-                  value: '{#HOSTNAME}'
+                  value: '{#DISPLAYNAME}'
                 - tag: resource
                   value: general
                 - tag: target
@@ -271,17 +272,17 @@ zabbix_export:
                   value: gauge
               trigger_prototypes:
                 - uuid: 2a36855331c3467b992c155737842daf
-                  expression: 'last(/Multiple Website certificate by Zabbix agent 2/cert.sha1_fingerprint[{#HOSTNAME}])<> last(/Multiple Website certificate by Zabbix agent 2/cert.sha1_fingerprint[{#HOSTNAME}],#2)'
-                  name: 'Cert: Fingerprint {#HOSTNAME} has changed (new version: {ITEM.VALUE})'
+                  expression: 'last(/Multiple Website certificate by Zabbix agent 2/cert.sha1_fingerprint[{#DISPLAYNAME}])<> last(/Multiple Website certificate by Zabbix agent 2/cert.sha1_fingerprint[{#DISPLAYNAME}],#2)'
+                  name: 'Cert: Fingerprint {#DISPLAYNAME} has changed (new version: {ITEM.VALUE})'
                   priority: INFO
                   description: |
                     The SSL certificate fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Ack to close.
                     There could be multiple valid certificates on some installations. In this case, the trigger will have a false positive. You can ignore it or disable the trigger.
                   manual_close: 'YES'
             - uuid: 85944795b68b44739e59276b8d06b5bb
-              name: 'Cert: Signature algorithm on {#HOSTNAME}'
+              name: 'Cert: Signature algorithm on {#DISPLAYNAME}'
               type: DEPENDENT
-              key: 'cert.signature_algorithm[{#HOSTNAME}]'
+              key: 'cert.signature_algorithm[{#DISPLAYNAME}]'
               delay: '0'
               trends: '0'
               value_type: CHAR
@@ -293,7 +294,7 @@ zabbix_export:
                 key: 'web.certificate.get[{#HOSTNAME},{#PORT},{#IP}]'
               tags:
                 - tag: hostname
-                  value: '{#HOSTNAME}'
+                  value: '{#DISPLAYNAME}'
                 - tag: resource
                   value: general
                 - tag: target
@@ -303,9 +304,9 @@ zabbix_export:
                 - tag: type
                   value: gauge
             - uuid: 7e6367c9177b4f4f80edade3fc9f39ef
-              name: 'Cert: Subject on {#HOSTNAME}'
+              name: 'Cert: Subject on {#DISPLAYNAME}'
               type: DEPENDENT
-              key: 'cert.subject[{#HOSTNAME}]'
+              key: 'cert.subject[{#DISPLAYNAME}]'
               delay: '0'
               trends: '0'
               value_type: TEXT
@@ -318,7 +319,7 @@ zabbix_export:
                 key: 'web.certificate.get[{#HOSTNAME},{#PORT},{#IP}]'
               tags:
                 - tag: hostname
-                  value: '{#HOSTNAME}'
+                  value: '{#DISPLAYNAME}'
                 - tag: resource
                   value: general
                 - tag: target
@@ -328,9 +329,9 @@ zabbix_export:
                 - tag: type
                   value: gauge
             - uuid: 4bace56b6bc64090ba3f6536f6d43e0a
-              name: 'Cert: Validation result on {#HOSTNAME}'
+              name: 'Cert: Validation result on {#DISPLAYNAME}'
               type: DEPENDENT
-              key: 'cert.validation[{#HOSTNAME}]'
+              key: 'cert.validation[{#DISPLAYNAME}]'
               delay: '0'
               trends: '0'
               value_type: CHAR
@@ -343,7 +344,7 @@ zabbix_export:
                 key: 'web.certificate.get[{#HOSTNAME},{#PORT},{#IP}]'
               tags:
                 - tag: hostname
-                  value: '{#HOSTNAME}'
+                  value: '{#DISPLAYNAME}'
                 - tag: resource
                   value: general
                 - tag: target
@@ -354,15 +355,15 @@ zabbix_export:
                   value: gauge
               trigger_prototypes:
                 - uuid: 7660bc8261ed43bd9c15652bb7fa444e
-                  expression: 'find(/Multiple Website certificate by Zabbix agent 2/cert.validation[{#HOSTNAME}],,"like","invalid")=1'
-                  name: 'Cert: SSL certificate {#HOSTNAME} is invalid'
+                  expression: 'find(/Multiple Website certificate by Zabbix agent 2/cert.validation[{#DISPLAYNAME}],,"like","invalid")=1'
+                  name: 'Cert: SSL certificate {#DISPLAYNAME} is invalid'
                   priority: HIGH
                   description: 'SSL certificate has expired or it is issued for another domain.'
                   manual_close: 'YES'
             - uuid: 1bc149911aab43bf91e8b5a5111c643f
-              name: 'Cert: Version on {#HOSTNAME}'
+              name: 'Cert: Version on {#DISPLAYNAME}'
               type: DEPENDENT
-              key: 'cert.version[{#HOSTNAME}]'
+              key: 'cert.version[{#DISPLAYNAME}]'
               delay: '0'
               trends: '0'
               value_type: CHAR
@@ -375,7 +376,7 @@ zabbix_export:
                 key: 'web.certificate.get[{#HOSTNAME},{#PORT},{#IP}]'
               tags:
                 - tag: hostname
-                  value: '{#HOSTNAME}'
+                  value: '{#DISPLAYNAME}'
                 - tag: resource
                   value: general
                 - tag: target
@@ -385,7 +386,7 @@ zabbix_export:
                 - tag: type
                   value: gauge
             - uuid: 4eb7862dd01947e69b278d946a875034
-              name: 'Cert: Get {#HOSTNAME}'
+              name: 'Cert: Get {#DISPLAYNAME}'
               key: 'web.certificate.get[{#HOSTNAME},{#PORT},{#IP}]'
               delay: 15m
               trends: '0'
@@ -398,7 +399,7 @@ zabbix_export:
                 - tag: data
                   value: raw
                 - tag: hostname
-                  value: '{#HOSTNAME}'
+                  value: '{#DISPLAYNAME}'
                 - tag: target
                   value: cert
                 - tag: transport
@@ -406,6 +407,8 @@ zabbix_export:
           master_item:
             key: cert.raw
           lld_macro_paths:
+            - lld_macro: '{#DISPLAYNAME}'
+              path: $.DISPLAYNAME
             - lld_macro: '{#HOSTNAME}'
               path: $.HOSTNAME
             - lld_macro: '{#IP}'
